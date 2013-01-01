@@ -8,3 +8,4 @@
 # TODO: inotify.
 # TODO: OS X FSEvents
 # TODO: Windows?
+# TODO: Switch to and/or integrate: http://pypi.python.org/pypi/colorama
