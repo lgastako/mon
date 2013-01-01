@@ -14,11 +14,6 @@ except Exception:
 
 DEFAULT_CONFIG_FILE="Monfile.json"
 
-# TODO: Create README with example Monfile(s).
-# TODO: Handle case where a file disappears.
-# TODO: Monitor the Monfile and restart if it changes.
-# TODO: Tests.  I know, I'm a terrible person.
-
 
 class Rule(object):
 

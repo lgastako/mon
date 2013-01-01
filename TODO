@@ -1,0 +1,10 @@
+# TODO: Create README with example Monfile(s).
+# TODO: Compare and contrast with e.g. 
+#       https://github.com/gorakhargosh/watchdog
+#       and others.
+# TODO: Handle case where a file disappears.
+# TODO: Monitor the Monfile and restart if it changes.
+# TODO: Tests.  I know, I'm a terrible person.
+# TODO: inotify.
+# TODO: OS X FSEvents
+# TODO: Windows?
