@@ -4,13 +4,14 @@ import os
 from setuptools import setup
 from setuptools import find_packages
 
+
 if __name__ == "__main__":
     setup(name="mon",
           version="1.0.0",
           description="Take actions when files change",
           author="John Evans",
           author_email="lgastako@gmail.com",
-          requires=["envoy", "glob2"],
+          install_requires=["envoy", "glob2", "termcolor"],
           provides=["mon"],
           entry_points=dict(console_scripts=[
               "mon = mon:main"
