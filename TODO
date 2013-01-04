@@ -12,3 +12,4 @@
 # TODO: Add a section to the Monfile for hardcoding command line options.
 # TODO: Add command line option to prevent monitoring of Monfile itself.
 # TODO: Add option to play sound effect on non-zero status code
+# TODO: Add ability to reference name of changed file(s) in Monfile actions.
