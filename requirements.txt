@@ -1,0 +1,13 @@
+envoy==0.0.2
+execnet==1.1
+glob2==0.3
+ipdb==0.7
+ipython==0.13.1
+pep8==1.4.5
+py==1.4.13
+pytest==2.3.4
+pytest-cache==0.9
+pytest-pep8==1.0.4
+readline==6.2.4.1
+termcolor==1.1.0
+wsgiref==0.1.2
