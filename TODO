@@ -1,18 +1,20 @@
-# TODO: Compare and contrast with e.g.
-#       https://github.com/gorakhargosh/watchdog
-#       and others.
-# TODO: Handle case where a file disappears.
-# TODO: Monitor the Monfile and restart if it changes.
 # TODO: More tests.  I know, I'm a terrible person.
-# TODO: inotify.
-# TODO: OS X FSEvents
-# TODO: Windows?
-# TODO: Switch to and/or integrate: http://pypi.python.org/pypi/colorama
-# TODO: Add a section to the Monfile for hardcoding command line options.
-# TODO: Add command line option to prevent monitoring of Monfile itself.
-# TODO: Add option to play sound effect on non-zero status code
 # TODO: Add ability to reference name of changed file(s) in Monfile actions.
 # TODO: Add named_actions and named_patterns section which can be referenced
 #       to be DRY.  Think about whether there is a better solution and if
 #       not then think through how this should best work.
+# TODO: Handle case where a file disappears.
+# TODO: Monitor the Monfile and restart if it changes.
+# TODO:   -  Add command line option to prevent monitoring of Monfile itself.
+# TODO: Add a section to the Monfile for hardcoding command line options.
+# TODO: Add option to play sound effect on non-zero status code
+#
+# TODO: inotify.
+# TODO: OS X FSEvents
+# TODO: Windows?
+#
+# TODO: Switch to and/or integrate: http://pypi.python.org/pypi/colorama
+# TODO: Compare and contrast with e.g.
+#       https://github.com/gorakhargosh/watchdog
+#       and others in README.
 #
