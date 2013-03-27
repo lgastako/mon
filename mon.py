@@ -46,6 +46,10 @@ def parse_rules(config):
 
 def execute_action(action, quiet):
     print "Running action: ", action
+
+    if isinstance(action, unicode):
+        action = action.encode("utf-8")
+
     response = envoy.run(action)
     if response.status_code == 0:
         color = "green"
@@ -82,7 +86,7 @@ class PollingMonitor(AbstractMonitor):
                 changes = self._detect_changes(rule.patterns)
                 if changes:
                     print "Changes detected in the following file%s: %s" % (
-                        ("s" if len(changes) > 1 else ""), 
+                        ("s" if len(changes) > 1 else ""),
                         ", ".join(changes)
                     )
                     rule.execute_all(self.quiet)
@@ -110,21 +114,31 @@ class PollingMonitor(AbstractMonitor):
     def _get_file_timestamp(self, pfile):
         return time.ctime(os.path.getmtime(pfile))
 
+
 def choose_monitor_class():
     if "inotify" in globals():
         return InotifyMonitor
     return PollingMonitor
 
 
+def load_rules_from_config(fn):
+    with open(fn) as f:
+        config = json.load(f)
+    return parse_rules(config)
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", "-c", default=DEFAULT_CONFIG_FILE)
-    parser.add_argument("--quiet", "-q", action="store_true")
+    parser.add_argument("-c", "--config",  default=DEFAULT_CONFIG_FILE)
+    parser.add_argument("-q", "--quiet",  action="store_true")
     args = parser.parse_args()
 
-    with open(args.config) as f:
-        config = json.load(f)
-    rules = parse_rules(config)
-    Monitor = choose_monitor_class()
-    monitor = Monitor(rules, args.quiet)
-    monitor.monitor()
+    try:
+        rules = load_rules_from_config(args.config)
+    except IOError:
+        parser.error("Could not read config file: %s" % args.config)
+    else:
+        Monitor = choose_monitor_class()
+        monitor = Monitor(rules, args.quiet)
+        monitor.monitor()
+
