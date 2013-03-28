@@ -1,8 +1,10 @@
-# TODO: Handle case where a file disappears.
 # TODO: Monitor the Monfile and restart if it changes.
 # TODO:   -  Add command line option to prevent monitoring of Monfile itself.
 # TODO: Add a section to the Monfile for hardcoding command line options.
 # TODO: Add option to play sound effect on non-zero status code
+# TODO: Test documentation automatically.
+#
+# TODO: Think through the multiple patterns story.
 #
 # TODO: inotify.
 # TODO: OS X FSEvents
@@ -11,6 +13,8 @@
 # TODO: Switch to and/or integrate: http://pypi.python.org/pypi/colorama
 # TODO: Compare and contrast with e.g.
 #       https://github.com/gorakhargosh/watchdog
+#       https://github.com/guard/guard/
+#       nodemon
 #       and others in README.
 # TODO: TODO's from the code.
 #
