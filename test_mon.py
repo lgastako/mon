@@ -55,21 +55,43 @@ class TestParseRules:
 
 class TestExecuteAction:
 
+    SC = partial(colored, color="green")
+    EC = partial(colored, color="red")
+
     def test_execute_successful_action_not_quiet(self, capfd):
-        execute_action("echo success", False)
+        execute_action("true", False)
         out, err = capfd.readouterr()
-        color = "green"
-        C = partial(colored, color=color)
-        assert out == ("Running action:  echo success\n" +
-                       C("Result: status code 0") + "\n" +
-                       C("-" * 78) + "\n" +
-                       C("success\n") + 
-                       "\n" +
-                       C("-" * 78) + "\n")
+        C = self.SC
+        expected = "\n".join([
+            "Running action:  true",
+            C("Result: status code 0"),
+            C("-" * 78),
+            C(""),
+            C("-" * 78),
+            ""
+        ])
+        assert out == expected
 
     def test_execute_successful_action_quiet(self, capfd):
-        execute_action("echo success", True)
+        execute_action("true", True)
         out, err = capfd.readouterr()
-        assert out == "success"
+        C = self.SC
+        expected = ("Running action:  true\n" +
+                    C("Result: status code 0") + "\n")
+        assert out == expected
 
+    def test_execute_error_action_not_quiet(self, capfd):
+        execute_action("false", False)
+        out, err = capfd.readouterr()
+        C = self.EC
+        expected = "\n".join([
+            "Running action:  false",
+            C("Result: status code 1"),
+            C("-" * 78),
+            C(""),
+            C("-" * 78),
+            ""
+        ])
+        out = out.encode("utf-8")
+        assert out == expected
 

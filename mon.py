@@ -5,6 +5,8 @@ import envoy
 import glob2
 import argparse
 
+from functools import partial
+
 from termcolor import colored
 
 try:
@@ -55,11 +57,12 @@ def execute_action(action, quiet):
         color = "green"
     else:
         color = "red"
-    print colored("Result: status code %d" % response.status_code, color)
+    C = partial(colored, color=color)
+    print C("Result: status code %d" % response.status_code)
     if not quiet:
-        print colored("-" * 78, color)
-        print colored(response.std_out, color)
-        print colored("-" * 78, color)
+        print C("-" * 78)
+        print C(response.std_out)
+        print C("-" * 78)
 
 
 class AbstractMonitor(object):
