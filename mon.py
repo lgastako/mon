@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import json
 import envoy
@@ -187,8 +188,11 @@ def choose_monitor_class():
 
 
 def load_rules_from_config(fn):
-    with open(fn) as f:
-        config = json.load(f)
+    if fn == "-":
+        config = json.load(sys.stdin)
+    else:
+        with open(fn) as f:
+            config = json.load(f)
     return parse_rules(config)
 
 
