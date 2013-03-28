@@ -1,4 +1,9 @@
+from functools import partial
+
 from mon import parse_rules
+from mon import execute_action
+
+from termcolor import colored
 
 
 class TestParseRules:
@@ -46,4 +51,25 @@ class TestParseRules:
         assert len(rule.actions) == 2
         assert rule.actions[0] == test_actions[0]
         assert rule.actions[1] == test_actions[1]
+
+
+class TestExecuteAction:
+
+    def test_execute_successful_action_not_quiet(self, capfd):
+        execute_action("echo success", False)
+        out, err = capfd.readouterr()
+        color = "green"
+        C = partial(colored, color=color)
+        assert out == ("Running action:  echo success\n" +
+                       C("Result: status code 0") + "\n" +
+                       C("-" * 78) + "\n" +
+                       C("success\n") + 
+                       "\n" +
+                       C("-" * 78) + "\n")
+
+    def test_execute_successful_action_quiet(self, capfd):
+        execute_action("echo success", True)
+        out, err = capfd.readouterr()
+        assert out == "success"
+
 
