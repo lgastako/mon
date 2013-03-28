@@ -142,6 +142,10 @@ class InotifyMonitor(AbstractMonitor):
 
 class PollingMonitor(AbstractMonitor):
 
+    def __init__(self, *args, **kwargs):
+        super(PollingMonitor, self).__init__(*args, **kwargs)
+        self.pattern_files_cache = {}
+
     def monitor(self):
         print "Monitoring %d rule%s." % (
             len(self.rules),
@@ -164,10 +168,24 @@ class PollingMonitor(AbstractMonitor):
         changes = []
         for pattern in patterns:
             pattern_files = glob2.glob(pattern)
+            changes.extend(self._removed_files(pattern, pattern_files))
             for pfile in pattern_files:
                 if self._file_changed(pfile):
                     changes.append(pfile)
         return changes
+
+    def _removed_files(self, pattern, pattern_files):
+        pattern_files = frozenset(pattern_files)
+
+        try:
+            last_pattern_files = self.pattern_files_cache[pattern]
+        except KeyError:
+            last_pattern_files = frozenset()
+
+        removed_files = last_pattern_files - pattern_files
+        self.pattern_files_cache[pattern] = pattern_files
+        return removed_files
+
 
     def _file_changed(self, pfile):
         last_ts = self._timestamps.get(pfile)
