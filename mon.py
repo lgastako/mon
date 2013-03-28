@@ -53,15 +53,34 @@ def expand_names(rules, names):
     if names is None or len(names) <= 0:
         return rules
 
+    rules = expand_lhs_names(rules, names)
+    rules = expand_rhs_names(rules, names)
+    return rules
+
+
+def expand_lhs_names(rules, names):
     new_rules = []
     for rule in rules:
         for pattern in rule.patterns:
             if pattern in names:
                 for new_pat in names[pattern]:
-                    new_rules.append(Rule(new_pat, rule.actions))
+                    new_rules.append(Rule([new_pat], rule.actions))
             else:
                 new_rules.append(rule)
     return new_rules
+
+
+def expand_rhs_names(rules, names):
+    # This does it inplace, is that ok?
+    for rule in rules:
+        new_actions = []
+        for action in rule.actions:
+            if action in names:
+                new_actions.extend(names[action])
+            else:
+                new_actions.append(action)
+        rule.actions = new_actions
+    return rules
 
 
 def parse_rules(config):

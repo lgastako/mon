@@ -14,11 +14,60 @@ EC = partial(colored, color="red")
 class TestExpandNames:
 
     rules = [
+        Rule(["@lhs"], ["@rhs"])
     ]
 
     def test_empty_names_section(self):
         result = expand_names(self.rules, {})
         assert result == self.rules
+
+    def test_no_matching_name(self):
+        result = expand_names(self.rules, {})
+        assert result == self.rules
+
+    def test_lhs(self):
+        result = expand_names(self.rules, {"@lhs": ["a", "b", "c"]})
+        rule = result[0]
+        assert len(result) == 3
+
+        def rule_exists(lhs, rhs):
+            for rule in result:
+                if rule.patterns == [lhs] and rule.actions == [rhs]:
+                    return True
+            assert False, "Could not find rule with (lhs=%s, rhs=%s)" % (lhs, rhs)
+
+        assert rule_exists("a", "@rhs")
+        assert rule_exists("b", "@rhs")
+        assert rule_exists("c", "@rhs")
+
+    def test_rhs(self):
+        result = expand_names(self.rules, {"@rhs": ["d", "e", "f"]})
+        rule = result[0]
+        assert len(result) == 1
+
+        assert rule.patterns == ["@lhs"]
+        assert rule.actions == ["d", "e", "f"]
+
+    def test_both(self):
+        # Really this should use a pattern list instead of splitting it out.
+        # TODO: Fix
+        expected_rhs = ["d", "e", "f"]
+        result = expand_names(self.rules, {
+            "@lhs": ["a", "b", "c"],
+            "@rhs": expected_rhs
+        })
+        rule = result[0]
+        assert len(result) == 3
+
+        def rule_exists(lhs):
+            for rule in result:
+                if rule.patterns == [lhs] and rule.actions == expected_rhs:
+                    return True
+            assert False, "Could not find rule with (lhs=%s, rhs=%s)" % (lhs, rhs)
+
+        assert rule_exists("a")
+        assert rule_exists("b")
+        assert rule_exists("c")
 
 
 class TestParseRules:
