@@ -21,7 +21,7 @@ DEFAULT_CONFIG_FILE="Monfile.json"
 def first(xs):
     try:
         return xs[0]
-    except IndexError:
+    except (IndexError, TypeError):
         if xs is None or len(xs) ==0:
             return None
         raise
