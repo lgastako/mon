@@ -17,15 +17,33 @@ except Exception:
 DEFAULT_CONFIG_FILE="Monfile.json"
 
 
+def first(xs):
+    try:
+        return xs[0]
+    except IndexError:
+        if xs is None or len(xs) ==0:
+            return None
+        raise
+
+
 class Rule(object):
 
     def __init__(self, patterns, actions):
         self.patterns = patterns
         self.actions = actions
 
-    def execute_all(self, quiet):
+    def fill_references(self, action, changed_files):
+        references = {
+            "filename": first(changed_files),
+            "filenames": " ".join(changed_files),
+            "filename_list": ", ".join(changed_files)
+        }
+        return action % references
+
+    def execute_all(self, quiet, changed_files):
         for action in self.actions:
-            execute_action(action, quiet)
+            final_action = self.fill_references(action, changed_files)
+            execute_action(final_action, quiet)
 
 
 def parse_rules(config):
@@ -92,7 +110,7 @@ class PollingMonitor(AbstractMonitor):
                         ("s" if len(changes) > 1 else ""),
                         ", ".join(changes)
                     )
-                    rule.execute_all(self.quiet)
+                    rule.execute_all(self.quiet, changes)
                 else:
                     time.sleep(1)
 

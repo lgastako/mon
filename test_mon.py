@@ -101,7 +101,7 @@ class TestRules:
 
     def test_can_reference_modified_filename_in_action(self, capfd):
         rule = Rule("*", ["echo 'file changed: %(filename)s'"])
-        rule.execute_all(False)
+        rule.execute_all(False, ["foo.txt"])
 
         out, err = capfd.readouterr()
         C = SC
@@ -110,7 +110,7 @@ class TestRules:
             "Running action:  echo 'file changed: foo.txt'",
             C("Result: status code 0"),
             C("-" * 78),
-            C("file changed: foo.txt"),
+            C("file changed: foo.txt\n"),
             C("-" * 78),
             ""
         ])
