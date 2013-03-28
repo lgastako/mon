@@ -3,12 +3,36 @@ from functools import partial
 from mon import parse_rules
 from mon import execute_action
 from mon import expand_names
+from mon import first
 from mon import Rule
 
 from termcolor import colored
 
 SC = partial(colored, color="green")
 EC = partial(colored, color="red")
+
+# TODO: Missing tests:
+# - Removed file handling in PollingMonitor
+# - Handling of - as stdin in config handling
+# - WTF is all this gro ups stuff in parse_rules -- oops, fix.
+
+
+class TestFirst:
+
+    def test_first_none(self):
+        assert first(None) == None
+
+    def test_first_empty(self):
+        assert first([]) == None
+
+    def test_first_non_empty(self):
+        assert first([1]) == 1
+        assert first([1, 2]) == 1
+        assert first([1, 2, 3]) == 1
+
+        assert first([3]) == 3
+        assert first([3, 2]) == 3
+        assert first([3, 2, 1]) == 3
 
 
 class TestExpandNames:
