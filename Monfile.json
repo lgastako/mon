@@ -1,0 +1,8 @@
+{
+    "names": {
+        "@test": "py.test"
+    },
+    "rules": {
+        "**/*.py": "@test"
+    }
+}

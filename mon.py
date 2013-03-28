@@ -84,24 +84,27 @@ def expand_rhs_names(rules, names):
     return rules
 
 
+def ensure_names_are_lists(names):
+    for name, value in names.iteritems():
+        if not isinstance(value, list):
+            names[name] = [value]
+
+
 def parse_rules(config):
-    groups = config.get("groups", [])
     rules = []
     try:
         rules_config = config["rules"]
     except KeyError:
         raise Exception("No \"rules\" section present in config file.")
     for pattern, actions in rules_config.iteritems():
-        if pattern in groups:
-            pattern = groups[pattern]
-        elif not isinstance(pattern, list):
-            pattern = [pattern]
+        patterns = [pattern]
         if not isinstance(actions, list):
             actions = [actions]
-        rules.append(Rule(pattern, actions))
+        rules.append(Rule(patterns, actions))
 
     try:
         names_config = config["names"]
+        ensure_names_are_lists(names_config)
         rules = expand_names(rules, names_config)
     except KeyError:
         pass
@@ -135,6 +138,12 @@ class AbstractMonitor(object):
         self.quiet = quiet
         self._timestamps = {}
 
+    def monitor(self):
+        raise NotImplementedError
+
+    def stop(self):
+        raise NotImplementedError
+
 
 class InotifyMonitor(AbstractMonitor):
     pass
@@ -145,13 +154,14 @@ class PollingMonitor(AbstractMonitor):
     def __init__(self, *args, **kwargs):
         super(PollingMonitor, self).__init__(*args, **kwargs)
         self.pattern_files_cache = {}
+        self.stopped = False
 
     def monitor(self):
         print "Monitoring %d rule%s." % (
             len(self.rules),
             ("s"  if len(self.rules) > 1 else "")
         )
-        while 1:
+        while not self.stopped:
             for rule in self.rules:
                 changes = self._detect_changes(rule.patterns)
                 if changes:
@@ -162,6 +172,9 @@ class PollingMonitor(AbstractMonitor):
                     rule.execute_all(self.quiet, changes)
                 else:
                     time.sleep(1)
+
+    def stop(self):
+        self.stopped = True
 
     def _detect_changes(self, patterns):
         # print "checking patterns: %s" % ", ".join(patterns)

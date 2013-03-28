@@ -1,10 +1,15 @@
 from functools import partial
 
+import os
+import time
+import threading
+
 from mon import parse_rules
 from mon import execute_action
 from mon import expand_names
 from mon import first
 from mon import Rule
+from mon import PollingMonitor
 
 from termcolor import colored
 
@@ -15,6 +20,10 @@ EC = partial(colored, color="red")
 # - Removed file handling in PollingMonitor
 # - Handling of - as stdin in config handling
 # - WTF is all this gro ups stuff in parse_rules -- oops, fix.
+# - Stopping a monitor
+# - Supplying a string instead of a list of strings for rhs.
+# - Embedding a name in a list on the rhs,
+#   e.g. {rules: {"*.py": ["foo", "@name", "bar"]}}
 
 
 class TestFirst:
@@ -262,3 +271,64 @@ class TestRules:
             ""
         ])
         assert out == expected
+
+
+class TestPollingMonitor:
+
+    def setup_method(self, method):
+        self.thread = None
+        self.calls = 0
+
+    def make_monitor(self, tmpdir, quiet=False):
+        pattern = os.path.join(str(tmpdir), "*.ttt")
+        rule = Rule([pattern], "true")
+        rule.execute_all = self.execute_all
+        monitor = PollingMonitor([rule], quiet)
+        return monitor
+
+    def run_in_thread(self, f):
+        thread = threading.Thread(target=f)
+        thread.daemon = True
+        thread.start()
+        self.thread = thread
+        return thread
+
+    def execute_all(self, quiet, changes):
+        # Mock method for our PollingMonitor
+        self.calls += 1
+
+    def touch(self, tmpdir, filename):
+        with tmpdir.join(filename).open("w") as f:
+            pass
+
+    def wait_a_sec(self):
+        time.sleep(0.01)
+
+    def test_no_call_when_no_change(self, tmpdir):
+        monitor = self.make_monitor(tmpdir)
+        try:
+            self.run_in_thread(lambda: monitor.monitor())
+            self.wait_a_sec()
+        finally:
+            monitor.stop()
+        assert self.calls == 0
+
+    def test_detects_file_change(self, tmpdir):
+        monitor = self.make_monitor(tmpdir)
+        try:
+            self.run_in_thread(lambda: monitor.monitor())
+            self.touch(tmpdir, "foo.ttt")
+            self.wait_a_sec()
+        finally:
+            monitor.stop()
+        assert self.calls == 1
+
+    def test_detects_file_added(self):
+        raise NotImplementedError
+
+    def test_detects_file_removed(self):
+        raise NotImplementedError
+
+    def test_stop(self):
+        raise NotImplementedError
+
