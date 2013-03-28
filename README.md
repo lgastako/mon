@@ -52,11 +52,81 @@ This Monfile defines three separate rules:
     3. If ANY css file changes, re-run the minification process.
 
 
-(COMING SOON!)
 You can reference the name of the changed file like so:
 
     {
         "rules": {
             "**/*": "echo '%(filename)s changed.'",
     }
+
+
+Advanced
+--------
+
+You can create named lists to DRY things up:
+
+    {
+        "names": {
+            "@source_files": [
+                "*.py",
+                "*.html",
+                "*.css",
+                "*.js",
+            ]
+        },
+        "rules": {
+            "@source_files": "make"
+        }
+    }
+
+(The strings are normal strings, and the @ has no special meaning but I use it for
+ names in my Monfiles by convention to provide a visual cue you are looking at a
+ name).
+
+The above has the same effect as this:
+
+    {
+        "rules": {
+            "*.py": "make",
+            "*.html": "make",
+            "*.css": "make",
+            "*.js": "make"
+        }
+    }
+
+The latter is actually more terse and readable, but if you decide that instead of
+using make you are going to use cmake, now you have to change 4 spots instead of
+one.
+
+In this case we're essentially using the names mechanism to have lists as keys
+but the name substituion works in actions too, eg:
+
+    {
+        "names": {
+            "@build_cmds": [
+                "make clean",
+                "make all",
+                "make install",
+            ]
+        },
+        "rules": {
+            "*.c": "@build_cmds"
+        }
+    }
+
+which is equivalent to this:
+
+    {
+        "rules": {
+            "*.c": ["make clean",
+                    "make all",
+                    "make install"]
+        }
+    }
+
+And of course you could use a named list on both the left and
+right side so you would end up with the cross product of the two
+list mapped as pattern/actions.
+
+This notation is more useful in larger more complex Monfiles.
 
