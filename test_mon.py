@@ -116,3 +116,36 @@ class TestRules:
         ])
         assert out == expected
 
+    def test_can_reference_modified_filenames_in_action(self, capfd):
+        rule = Rule("*", ["echo 'file changed: %(filenames)s'"])
+        rule.execute_all(False, ["foo.txt", "bar.txt"])
+
+        out, err = capfd.readouterr()
+        C = SC
+
+        expected = "\n".join([
+            "Running action:  echo 'file changed: foo.txt bar.txt'",
+            C("Result: status code 0"),
+            C("-" * 78),
+            C("file changed: foo.txt bar.txt\n"),
+            C("-" * 78),
+            ""
+        ])
+        assert out == expected
+
+    def test_can_reference_modified_filename_list_in_action(self, capfd):
+        rule = Rule("*", ["echo 'file changed: %(filename_list)s'"])
+        rule.execute_all(False, ["foo.txt", "bar.txt"])
+
+        out, err = capfd.readouterr()
+        C = SC
+
+        expected = "\n".join([
+            "Running action:  echo 'file changed: foo.txt, bar.txt'",
+            C("Result: status code 0"),
+            C("-" * 78),
+            C("file changed: foo.txt, bar.txt\n"),
+            C("-" * 78),
+            ""
+        ])
+        assert out == expected

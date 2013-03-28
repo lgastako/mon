@@ -1,5 +1,4 @@
 # TODO: More tests.  I know, I'm a terrible person.
-# TODO: Add ability to reference name of changed file(s) in Monfile actions.
 # TODO: Add named_actions and named_patterns section which can be referenced
 #       to be DRY.  Think about whether there is a better solution and if
 #       not then think through how this should best work.
