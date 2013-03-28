@@ -313,7 +313,8 @@ class TestPollingMonitor:
             monitor.stop()
         assert self.calls == 0
 
-    def test_detects_file_change(self, tmpdir):
+    def test_detects_file_changed(self, tmpdir):
+        self.touch(tmpdir, "foo.ttt")
         monitor = self.make_monitor(tmpdir)
         try:
             self.run_in_thread(lambda: monitor.monitor())
@@ -323,8 +324,15 @@ class TestPollingMonitor:
             monitor.stop()
         assert self.calls == 1
 
-    def test_detects_file_added(self):
-        raise NotImplementedError
+    def test_detects_file_added(self, tmpdir):
+        monitor = self.make_monitor(tmpdir)
+        try:
+            self.run_in_thread(lambda: monitor.monitor())
+            self.touch(tmpdir, "foo.ttt")
+            self.wait_a_sec()
+        finally:
+            monitor.stop()
+        assert self.calls == 1
 
     def test_detects_file_removed(self):
         raise NotImplementedError
