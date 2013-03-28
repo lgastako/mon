@@ -45,6 +45,24 @@ class Rule(object):
             final_action = self.fill_references(action, changed_files)
             execute_action(final_action, quiet)
 
+    def __repr__(self):
+        return "Rule(%s, %s)" % (self.patterns, self.actions)
+
+
+def expand_names(rules, names):
+    if names is None or len(names) <= 0:
+        return rules
+
+    new_rules = []
+    for rule in rules:
+        for pattern in rule.patterns:
+            if pattern in names:
+                for new_pat in names[pattern]:
+                    new_rules.append(Rule(new_pat, rule.actions))
+            else:
+                new_rules.append(rule)
+    return new_rules
+
 
 def parse_rules(config):
     groups = config.get("groups", [])
@@ -61,6 +79,13 @@ def parse_rules(config):
         if not isinstance(actions, list):
             actions = [actions]
         rules.append(Rule(pattern, actions))
+
+    try:
+        names_config = config["names"]
+        rules = expand_names(rules, names_config)
+    except KeyError:
+        pass
+
     return rules
 
 

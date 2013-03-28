@@ -2,12 +2,23 @@ from functools import partial
 
 from mon import parse_rules
 from mon import execute_action
+from mon import expand_names
 from mon import Rule
 
 from termcolor import colored
 
 SC = partial(colored, color="green")
 EC = partial(colored, color="red")
+
+
+class TestExpandNames:
+
+    rules = [
+    ]
+
+    def test_empty_names_section(self):
+        result = expand_names(self.rules, {})
+        assert result == self.rules
 
 
 class TestParseRules:
@@ -55,6 +66,35 @@ class TestParseRules:
         assert len(rule.actions) == 2
         assert rule.actions[0] == test_actions[0]
         assert rule.actions[1] == test_actions[1]
+
+    def test_parse_rules(self):
+        config = {
+            "names": {
+                "@source_files": [
+                    "**/*.py",
+                    "**/*.html",
+                    "**/*.css",
+                    "**/*.js",
+                    "**/*.coffee"
+                ]
+            },
+            "rules": {
+                "@source_files": "echo 'source file changed'"
+            },
+        }
+        rules = parse_rules(config)
+
+        def rule_exists(pat):
+            for rule in rules:
+                if pat in rule.patterns:
+                    return True
+
+        assert len(rules) == 5
+        assert rule_exists("**/*.py")
+        assert rule_exists("**/*.html")
+        assert rule_exists("**/*.css")
+        assert rule_exists("**/*.js")
+        assert rule_exists("**/*.coffee")
 
 
 class TestExecuteAction:
