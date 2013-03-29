@@ -51,19 +51,31 @@ This Monfile defines three separate rules:
     2. If ANY python file changes, re-run the tests.
     3. If ANY css file changes, re-run the minification process.
 
-
 You can reference the name of the changed file like so:
 
     {
         "rules": {
-            "**/*": "echo '%(filename)s changed.'",
+            "**/*": "echo '%(filename)s changed.'"
+        }
+    }
+
+You can also provide a list of commands instead a single command, like so:
+
+    {
+        "rules": {
+            "README.txt": [
+                "spellcheck README.txt",
+                "pdfify README.txt -o README.pdf"
+            ]
+        }
     }
 
 
 Advanced
 --------
 
-You can create named lists to DRY things up:
+You can create named lists to DRY things up or provide a list of patterns
+for a single rule:
 
     {
         "names": {

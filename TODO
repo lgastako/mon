@@ -21,5 +21,6 @@
 #       https://github.com/guard/guard/
 #       nodemon
 #       and others in README.
+# TODO: Load multi patterns into single rules instead of multiple rules
 # TODO: TODO's from the code.
 #
