@@ -1,13 +1,13 @@
-# TODO: Monitor the Monfile and restart if it changes.
-# TODO:   -  Add command line option to prevent monitoring of Monfile itself.
 # TODO: Add a section to the Monfile for hardcoding command line options.
+#
 # TODO: Add option to play sound effect on non-zero status code
+#
 # TODO: Test documentation automatically.
+#
 # TODO: Add option to hit enter or some other key(s) to manually trigger
 #       a rule... what rule? there could be many! oh noes!  maybe this
 #       only applies when theres a single rule, or maybe it triggers all
 #       (this seems like a bad idea).  Well, think it through.
-# TODO: Add option to not fire events on first pass.
 #
 # TODO: Think through the multiple patterns story.
 #

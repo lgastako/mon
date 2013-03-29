@@ -332,14 +332,12 @@ class TestPollingMonitor:
         def change_file():
             self.touch(tmpdir, data="bar")
         self.run_mon(tmpdir, change_file, 1)
-        # One for start, one for change
-        assert self.calls == 2
+        assert self.calls == 1
 
     def test_detects_file_added(self, tmpdir):
         def add_file():
             self.touch(tmpdir)
         self.run_mon(tmpdir, add_file, 0.5)
-        # None for start (no files), one for add.
         assert self.calls == 1
 
     def test_detects_file_removed(self, tmpdir):
@@ -347,8 +345,7 @@ class TestPollingMonitor:
         def remove_file():
             tmpdir.join(self.default_fn).remove(rec=1)
         self.run_mon(tmpdir, remove_file, 0.5)
-        # One for start, one for remove
-        assert self.calls == 2
+        assert self.calls == 1
 
     def test_stop(self, tmpdir):
         monitor = self.make_monitor(tmpdir)

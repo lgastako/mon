@@ -156,11 +156,19 @@ class PollingMonitor(AbstractMonitor):
         self.pattern_files_cache = {}
         self.stopped = False
 
+    def _prime_pump(self):
+        # This primes the pump.
+        for rule in self.rules:
+            self._detect_changes(rule.patterns)
+
     def monitor(self):
         print "Monitoring %d rule%s." % (
             len(self.rules),
             ("s"  if len(self.rules) > 1 else "")
         )
+
+        self._prime_pump()
+
         while not self.stopped:
             for rule in self.rules:
                 changes = self._detect_changes(rule.patterns)
@@ -231,10 +239,22 @@ def load_rules_from_config(fn):
     return parse_rules(config)
 
 
+def restart(*args, **kwargs):
+    os.execv(sys.argv[0], sys.argv)
+
+
+def monitor_self(rules, config_fn):
+    patterns = [config_fn]
+    rule = Rule(patterns, [])
+    rule.execute_all = restart
+    return [rule]
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config",  default=DEFAULT_CONFIG_FILE)
     parser.add_argument("-q", "--quiet",  action="store_true")
+    parser.add_argument("-n", "--no-restart",  action="store_true")
     args = parser.parse_args()
 
     try:
@@ -242,6 +262,8 @@ def main():
     except IOError:
         parser.error("Could not read config file: %s" % args.config)
     else:
+        if not args.no_restart:
+            rules.extend(monitor_self(rules, args.config))
         Monitor = choose_monitor_class()
         monitor = Monitor(rules, args.quiet)
         monitor.monitor()
