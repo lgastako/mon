@@ -199,10 +199,14 @@ class PollingMonitor(AbstractMonitor):
         self.pattern_files_cache[pattern] = pattern_files
         return removed_files
 
-
     def _file_changed(self, pfile):
         last_ts = self._timestamps.get(pfile)
-        file_ts = self._get_file_timestamp(pfile)
+        try:
+            file_ts = self._get_file_timestamp(pfile)
+        except OSError:
+            # We assume this is because the file was removed before we could
+            # get the time, so it definitely changed.
+            return True
         if not last_ts or file_ts > last_ts:
             self._timestamps[pfile] = file_ts
             return True

@@ -275,6 +275,8 @@ class TestRules:
 
 class TestPollingMonitor:
 
+    default_fn = "foo.ttt"
+
     def setup_method(self, method):
         self.thread = None
         self.calls = 0
@@ -295,48 +297,70 @@ class TestPollingMonitor:
 
     def execute_all(self, quiet, changes):
         # Mock method for our PollingMonitor
+        print "CHANGES: ", changes
         self.calls += 1
 
-    def touch(self, tmpdir, filename):
+    def touch(self, tmpdir, filename=default_fn):
         with tmpdir.join(filename).open("w") as f:
             pass
 
-    def wait_a_sec(self):
-        time.sleep(0.01)
+    def remove(self, tmpdir, filename=default_fn):
+        tmpdir.join(filename).remove(rec=1)
+
+    def wait_a_sec(self, duration=0.01):
+        time.sleep(duration)
+
+    def start_monitor(self, monitor):
+        self.run_in_thread(lambda: monitor.monitor())
 
     def test_no_call_when_no_change(self, tmpdir):
         monitor = self.make_monitor(tmpdir)
         try:
-            self.run_in_thread(lambda: monitor.monitor())
+            self.start_monitor(monitor)
             self.wait_a_sec()
         finally:
             monitor.stop()
         assert self.calls == 0
 
     def test_detects_file_changed(self, tmpdir):
-        self.touch(tmpdir, "foo.ttt")
+        self.touch(tmpdir)
         monitor = self.make_monitor(tmpdir)
         try:
-            self.run_in_thread(lambda: monitor.monitor())
-            self.touch(tmpdir, "foo.ttt")
+            self.start_monitor(monitor)
+            self.touch(tmpdir)
             self.wait_a_sec()
         finally:
             monitor.stop()
-        assert self.calls == 1
+        # One for start, one for change
+        assert self.calls == 2
 
     def test_detects_file_added(self, tmpdir):
         monitor = self.make_monitor(tmpdir)
         try:
-            self.run_in_thread(lambda: monitor.monitor())
-            self.touch(tmpdir, "foo.ttt")
+            self.start_monitor(monitor)
+            self.touch(tmpdir)
             self.wait_a_sec()
         finally:
             monitor.stop()
+        # None for start (no files), one for add.
         assert self.calls == 1
 
-    def test_detects_file_removed(self):
-        raise NotImplementedError
+    def test_detects_file_removed(self, tmpdir):
+        self.touch(tmpdir)
+        monitor = self.make_monitor(tmpdir)
+        try:
+            self.run_in_thread(lambda: monitor.monitor())
+            self.remove(tmpdir)
+            self.wait_a_sec(0.1)
+        finally:
+            monitor.stop()
+        # One for start, one for remove
+        assert self.calls == 2
 
-    def test_stop(self):
-        raise NotImplementedError
+    def test_stop(self, tmpdir):
+        monitor = self.make_monitor(tmpdir)
+        thread = self.run_in_thread(lambda: monitor.monitor())
+        monitor.stop()
+        self.wait_a_sec()
+        assert not thread.is_alive()
 
