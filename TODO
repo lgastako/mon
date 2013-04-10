@@ -1,3 +1,6 @@
+# TODO: Add something for excluding paths, e.g. autogen directories from
+#       Template Haskell.
+#
 # TODO: Add a section to the Monfile for hardcoding command line options.
 #
 # TODO: Add option to play sound effect on non-zero status code
@@ -8,6 +11,8 @@
 #       a rule... what rule? there could be many! oh noes!  maybe this
 #       only applies when theres a single rule, or maybe it triggers all
 #       (this seems like a bad idea).  Well, think it through.
+#       # Maybe we have to make it an interactive program with individual
+#       # keypresses triggering menus etc.  What happened to simple?
 #
 # TODO: Think through the multiple patterns story.
 #
